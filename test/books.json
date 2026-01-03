@@ -1,0 +1,14 @@
+[
+  {
+    "Title": "Clean Code",
+    "Price": 30.00,
+    "Genre": "Other",
+    "PublishedDate": "2008-08-01"
+  },
+  {
+    "Title": "The Pragmatic Programmer",
+    "Price": 35.00,
+    "Genre": "Other",
+    "PublishedDate": "1999-10-30"
+  }
+]

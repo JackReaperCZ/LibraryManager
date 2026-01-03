@@ -1,0 +1,14 @@
+[
+  {
+    "FirstName": "Bob",
+    "LastName": "Brown",
+    "Email": "bob.brown@example.com",
+    "RegisteredDate": "2023-04-05"
+  },
+  {
+    "FirstName": "Charlie",
+    "LastName": "Davis",
+    "Email": "charlie.d@example.com",
+    "RegisteredDate": "2023-05-12"
+  }
+]
