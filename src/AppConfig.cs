@@ -4,12 +4,29 @@ using System.IO;
 
 namespace LibraryManager
 {
+    /// <summary>
+    /// Manages application configuration settings.
+    /// </summary>
     public static class AppConfig
     {
+        /// <summary>
+        /// Gets the database connection string.
+        /// </summary>
         public static string ConnectionString { get; private set; }
+
+        /// <summary>
+        /// Gets the default path for import/export operations.
+        /// </summary>
         public static string ImportExportPath { get; private set; }
+
+        /// <summary>
+        /// Gets the date format string used in the application.
+        /// </summary>
         public static string DateFormat { get; private set; }
 
+        /// <summary>
+        /// Loads configuration from appsettings.json.
+        /// </summary>
         public static void LoadConfiguration()
         {
             var builder = new ConfigurationBuilder()

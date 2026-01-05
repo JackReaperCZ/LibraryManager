@@ -8,17 +8,28 @@ using System.Windows.Forms;
 
 namespace LibraryManager.Services
 {
+    /// <summary>
+    /// Service class responsible for importing data from external files (CSV, JSON).
+    /// </summary>
     public class ImportService
     {
         private readonly BookRepository _bookRepository;
         private readonly MemberRepository _memberRepository;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImportService"/> class.
+        /// </summary>
         public ImportService()
         {
             _bookRepository = new BookRepository();
             _memberRepository = new MemberRepository();
         }
 
+        /// <summary>
+        /// Imports books from a CSV file.
+        /// Expected CSV format: Title,Price,Genre,PublishedDate
+        /// </summary>
+        /// <param name="filePath">The full path to the CSV file.</param>
         public void ImportBooksFromCsv(string filePath)
         {
             var lines = File.ReadAllLines(filePath);
@@ -57,6 +68,10 @@ namespace LibraryManager.Services
             }
         }
 
+        /// <summary>
+        /// Imports books from a JSON file.
+        /// </summary>
+        /// <param name="filePath">The full path to the JSON file.</param>
         public void ImportBooksFromJson(string filePath)
         {
             var json = File.ReadAllText(filePath);
@@ -71,6 +86,11 @@ namespace LibraryManager.Services
             }
         }
 
+        /// <summary>
+        /// Imports members from a CSV file.
+        /// Expected CSV format: FirstName,LastName,Email,RegisteredDate
+        /// </summary>
+        /// <param name="filePath">The full path to the CSV file.</param>
         public void ImportMembersFromCsv(string filePath)
         {
              var lines = File.ReadAllLines(filePath);
@@ -98,11 +118,15 @@ namespace LibraryManager.Services
                 }
                 catch
                 {
-                    // Ignore errors for now
+                     // Ignore errors for individual lines to allow partial import
                 }
             }
         }
 
+        /// <summary>
+        /// Imports members from a JSON file.
+        /// </summary>
+        /// <param name="filePath">The full path to the JSON file.</param>
         public void ImportMembersFromJson(string filePath)
         {
             var json = File.ReadAllText(filePath);
@@ -111,7 +135,7 @@ namespace LibraryManager.Services
             {
                 foreach (var member in members)
                 {
-                    member.IsActive = true;
+                    member.IsActive = true; // Default
                     _memberRepository.Add(member);
                 }
             }

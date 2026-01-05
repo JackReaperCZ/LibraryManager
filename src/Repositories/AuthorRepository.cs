@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 namespace LibraryManager.Repositories
 {
+    /// <summary>
+    /// Repository for managing Author entities in the database.
+    /// </summary>
     public class AuthorRepository : BaseRepository, IRepository<Author>
     {
+        /// <summary>
+        /// Retrieves all authors from the database.
+        /// </summary>
+        /// <returns>A collection of <see cref="Author"/> entities.</returns>
         public IEnumerable<Author> GetAll()
         {
             var authors = new List<Author>();
@@ -26,6 +33,11 @@ namespace LibraryManager.Repositories
             return authors;
         }
 
+        /// <summary>
+        /// Retrieves an author by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the author.</param>
+        /// <returns>The <see cref="Author"/> entity if found; otherwise, null.</returns>
         public Author GetById(int id)
         {
             using (var conn = GetConnection())
@@ -47,6 +59,10 @@ namespace LibraryManager.Repositories
             return null;
         }
 
+        /// <summary>
+        /// Adds a new author to the database.
+        /// </summary>
+        /// <param name="entity">The author to add.</param>
         public void Add(Author entity)
         {
             using (var conn = GetConnection())
@@ -63,6 +79,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates an existing author in the database.
+        /// </summary>
+        /// <param name="entity">The author with updated information.</param>
         public void Update(Author entity)
         {
             using (var conn = GetConnection())
@@ -80,6 +100,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes an author from the database by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the author to delete.</param>
         public void Delete(int id)
         {
             using (var conn = GetConnection())
@@ -94,6 +118,11 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Maps a database reader row to an Author object.
+        /// </summary>
+        /// <param name="reader">The data reader.</param>
+        /// <returns>A populated <see cref="Author"/> object.</returns>
         private Author MapAuthor(MySqlDataReader reader)
         {
             return new Author

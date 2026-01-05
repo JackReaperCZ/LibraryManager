@@ -52,4 +52,4 @@ A desktop application for library management developed in C# (Windows Forms) wit
 
 ## License
 
-This project is for educational purposes.
+MIT License

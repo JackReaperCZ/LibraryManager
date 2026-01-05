@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 namespace LibraryManager.Repositories
 {
+    /// <summary>
+    /// Repository for managing Loan entities and related transactions in the database.
+    /// </summary>
     public class LoanRepository : BaseRepository, IRepository<Loan>
     {
+        /// <summary>
+        /// Retrieves all loans from the database.
+        /// </summary>
+        /// <returns>A collection of <see cref="Loan"/> entities.</returns>
         public IEnumerable<Loan> GetAll()
         {
             var loans = new List<Loan>();
@@ -26,6 +33,11 @@ namespace LibraryManager.Repositories
             return loans;
         }
 
+        /// <summary>
+        /// Retrieves a loan by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the loan.</param>
+        /// <returns>The <see cref="Loan"/> entity if found; otherwise, null.</returns>
         public Loan GetById(int id)
         {
             using (var conn = GetConnection())
@@ -47,14 +59,21 @@ namespace LibraryManager.Repositories
             return null;
         }
 
+        /// <summary>
+        /// Adds a new loan using a transaction to ensure book availability is updated.
+        /// </summary>
+        /// <param name="entity">The loan to add.</param>
         public void Add(Loan entity)
         {
-            // Simple add without transaction logic, but requirements say "Při vytvoření výpůjčky...".
-            // So we should probably use CreateLoan instead.
-            // But for interface compliance:
             CreateLoan(entity);
         }
 
+        /// <summary>
+        /// Creates a new loan transaction.
+        /// Checks book availability, inserts the loan record, and updates the book status to unavailable.
+        /// </summary>
+        /// <param name="loan">The loan details.</param>
+        /// <exception cref="Exception">Thrown if the book is not available.</exception>
         public void CreateLoan(Loan loan)
         {
             using (var conn = GetConnection())
@@ -113,60 +132,10 @@ namespace LibraryManager.Repositories
             }
         }
 
-        public void ReturnLoan(int loanId)
-        {
-             using (var conn = GetConnection())
-            {
-                conn.Open();
-                using (var transaction = conn.BeginTransaction())
-                {
-                    try
-                    {
-                        // Get BookID
-                        int bookId = 0;
-                        string getBookQuery = "SELECT BookID FROM Loans WHERE LoanID = @LoanID";
-                         using (var getCmd = new MySqlCommand(getBookQuery, conn, transaction))
-                        {
-                            getCmd.Parameters.AddWithValue("@LoanID", loanId);
-                            object result = getCmd.ExecuteScalar();
-                            if (result != null)
-                            {
-                                bookId = Convert.ToInt32(result);
-                            }
-                            else
-                            {
-                                throw new Exception("Loan not found.");
-                            }
-                        }
-
-                        // Update Loan
-                        string updateLoanQuery = "UPDATE Loans SET Returned = TRUE, ReturnDate = @ReturnDate WHERE LoanID = @LoanID";
-                        using (var updateCmd = new MySqlCommand(updateLoanQuery, conn, transaction))
-                        {
-                            updateCmd.Parameters.AddWithValue("@LoanID", loanId);
-                            updateCmd.Parameters.AddWithValue("@ReturnDate", DateTime.Now);
-                            updateCmd.ExecuteNonQuery();
-                        }
-
-                        // Update Book
-                        string updateBookQuery = "UPDATE Books SET Available = TRUE WHERE BookID = @BookID";
-                        using (var updateCmd = new MySqlCommand(updateBookQuery, conn, transaction))
-                        {
-                            updateCmd.Parameters.AddWithValue("@BookID", bookId);
-                            updateCmd.ExecuteNonQuery();
-                        }
-
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// Updates an existing loan.
+        /// </summary>
+        /// <param name="entity">The loan with updated information.</param>
         public void Update(Loan entity)
         {
             using (var conn = GetConnection())
@@ -186,6 +155,62 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Returns a book from a loan transaction.
+        /// Updates the loan record and sets the book status to available.
+        /// </summary>
+        /// <param name="loanId">The identifier of the loan to return.</param>
+        public void ReturnBook(int loanId)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // Get BookID
+                        int bookId = 0;
+                        string getBookQuery = "SELECT BookID FROM Loans WHERE LoanID = @LoanID";
+                        using (var cmd = new MySqlCommand(getBookQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@LoanID", loanId);
+                            object result = cmd.ExecuteScalar();
+                            if (result != null) bookId = Convert.ToInt32(result);
+                        }
+
+                        // Update Loan
+                        string updateLoanQuery = "UPDATE Loans SET Returned = TRUE, ReturnDate = @ReturnDate WHERE LoanID = @LoanID";
+                        using (var cmd = new MySqlCommand(updateLoanQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@ReturnDate", DateTime.Now);
+                            cmd.Parameters.AddWithValue("@LoanID", loanId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Update Book
+                        string updateBookQuery = "UPDATE Books SET Available = TRUE WHERE BookID = @BookID";
+                        using (var cmd = new MySqlCommand(updateBookQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@BookID", bookId);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes a loan from the database by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the loan to delete.</param>
         public void Delete(int id)
         {
             using (var conn = GetConnection())
@@ -200,6 +225,11 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Maps a database reader row to a Loan object.
+        /// </summary>
+        /// <param name="reader">The data reader.</param>
+        /// <returns>A populated <see cref="Loan"/> object.</returns>
         private Loan MapLoan(MySqlDataReader reader)
         {
             return new Loan

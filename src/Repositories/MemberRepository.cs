@@ -5,8 +5,15 @@ using System.Collections.Generic;
 
 namespace LibraryManager.Repositories
 {
+    /// <summary>
+    /// Repository for managing Member entities in the database.
+    /// </summary>
     public class MemberRepository : BaseRepository, IRepository<Member>
     {
+        /// <summary>
+        /// Retrieves all members from the database.
+        /// </summary>
+        /// <returns>A collection of <see cref="Member"/> entities.</returns>
         public IEnumerable<Member> GetAll()
         {
             var members = new List<Member>();
@@ -26,6 +33,11 @@ namespace LibraryManager.Repositories
             return members;
         }
 
+        /// <summary>
+        /// Retrieves a member by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the member.</param>
+        /// <returns>The <see cref="Member"/> entity if found; otherwise, null.</returns>
         public Member GetById(int id)
         {
             using (var conn = GetConnection())
@@ -47,6 +59,10 @@ namespace LibraryManager.Repositories
             return null;
         }
 
+        /// <summary>
+        /// Adds a new member to the database.
+        /// </summary>
+        /// <param name="entity">The member to add.</param>
         public void Add(Member entity)
         {
             using (var conn = GetConnection())
@@ -65,6 +81,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Updates an existing member in the database.
+        /// </summary>
+        /// <param name="entity">The member with updated information.</param>
         public void Update(Member entity)
         {
             using (var conn = GetConnection())
@@ -84,6 +104,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes a member from the database by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the member to delete.</param>
         public void Delete(int id)
         {
             using (var conn = GetConnection())
@@ -98,6 +122,11 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Maps a database reader row to a Member object.
+        /// </summary>
+        /// <param name="reader">The data reader.</param>
+        /// <returns>A populated <see cref="Member"/> object.</returns>
         private Member MapMember(MySqlDataReader reader)
         {
             return new Member

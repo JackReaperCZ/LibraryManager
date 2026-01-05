@@ -3,8 +3,15 @@ using System.Data;
 
 namespace LibraryManager.Repositories
 {
+    /// <summary>
+    /// Repository for generating aggregated reports from the database.
+    /// </summary>
     public class ReportRepository : BaseRepository
     {
+        /// <summary>
+        /// Retrieves a report of members and their loan counts.
+        /// </summary>
+        /// <returns>A <see cref="DataTable"/> containing Member names and LoanCount.</returns>
         public DataTable GetMemberLoanCounts()
         {
             using (var conn = GetConnection())
@@ -26,6 +33,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Retrieves a report of popular books based on loan count.
+        /// </summary>
+        /// <returns>A <see cref="DataTable"/> containing Book titles, Genres, and LoanCount.</returns>
         public DataTable GetPopularBooks()
         {
              using (var conn = GetConnection())
@@ -47,6 +58,10 @@ namespace LibraryManager.Repositories
             }
         }
 
+        /// <summary>
+        /// Retrieves statistics about books and loans per genre.
+        /// </summary>
+        /// <returns>A <see cref="DataTable"/> containing Genre, BookCount, and TotalLoans.</returns>
         public DataTable GetGenreStats()
         {
              using (var conn = GetConnection())
