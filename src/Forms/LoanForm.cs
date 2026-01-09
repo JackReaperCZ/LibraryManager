@@ -57,7 +57,7 @@ namespace LibraryManager.Forms
                 {
                     try
                     {
-                        _repository.ReturnLoan(loan.LoanID);
+                        _repository.ReturnBook(loan.LoanID);
                         LoadLoans();
                     }
                     catch (Exception ex)

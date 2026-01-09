@@ -32,6 +32,17 @@ A desktop application for library management developed in C# (Windows Forms) wit
    - Build the project.
    - Run the application.
 
+## Single File Build (EXE)
+
+To build the application as a standalone executable:
+
+1. Open a terminal in the project root.
+2. Run the following command:
+   ```powershell
+   dotnet publish src/LibraryManager.csproj -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true -o publish_single
+   ```
+3. The executable `LibraryManager.exe` will be created in the `publish_single` folder.
+
 ## Project Structure
 
 - `src/Forms`: Windows Forms UI.

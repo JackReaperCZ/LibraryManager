@@ -40,12 +40,17 @@ The application uses a custom Repository pattern to abstract data access.
 - **Validation**: Input fields are validated in Forms (e.g., required fields).
 - **Import Errors**: File format or duplicate key errors are handled during import.
 
-## How to Run without IDE
+## How to Build and Run as Single File EXE
 
-1. Publish the application:
-   ```bash
-   dotnet publish -c Release -o ./publish
+1. **Publish the application**:
+   Open a terminal in the project root and run:
+   ```powershell
+   dotnet publish src/LibraryManager.csproj -c Release -r win-x64 -p:PublishSingleFile=true --self-contained true -o publish_single
    ```
-2. Navigate to `./publish` directory.
-3. Ensure `appsettings.json` is configured correctly.
-4. Run `LibraryManager.exe`.
+
+2. **Locate the executable**:
+   Navigate to the `publish_single` directory created in the project root.
+
+3. **Run the application**:
+   - Ensure `appsettings.json` is present in the same directory as the executable (it should be copied automatically).
+   - Double-click `LibraryManager.exe` or run it from the command line.
