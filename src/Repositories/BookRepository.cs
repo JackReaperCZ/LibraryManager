@@ -5,15 +5,8 @@ using System.Collections.Generic;
 
 namespace LibraryManager.Repositories
 {
-    /// <summary>
-    /// Repository for managing Book entities in the database.
-    /// </summary>
     public class BookRepository : BaseRepository, IRepository<Book>
     {
-        /// <summary>
-        /// Retrieves all books from the database.
-        /// </summary>
-        /// <returns>A collection of <see cref="Book"/> entities.</returns>
         public IEnumerable<Book> GetAll()
         {
             var books = new List<Book>();
@@ -33,11 +26,6 @@ namespace LibraryManager.Repositories
             return books;
         }
 
-        /// <summary>
-        /// Retrieves a book by its unique identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier of the book.</param>
-        /// <returns>The <see cref="Book"/> entity if found; otherwise, null.</returns>
         public Book GetById(int id)
         {
             using (var conn = GetConnection())
@@ -59,10 +47,6 @@ namespace LibraryManager.Repositories
             return null;
         }
 
-        /// <summary>
-        /// Adds a new book to the database.
-        /// </summary>
-        /// <param name="entity">The book to add.</param>
         public void Add(Book entity)
         {
             using (var conn = GetConnection())
@@ -77,14 +61,11 @@ namespace LibraryManager.Repositories
                     cmd.Parameters.AddWithValue("@Genre", MapGenreToString(entity.Genre));
                     cmd.Parameters.AddWithValue("@PublishedDate", entity.PublishedDate);
                     cmd.ExecuteNonQuery();
+                    entity.BookID = (int)cmd.LastInsertedId;
                 }
             }
         }
 
-        /// <summary>
-        /// Updates an existing book in the database.
-        /// </summary>
-        /// <param name="entity">The book with updated information.</param>
         public void Update(Book entity)
         {
             using (var conn = GetConnection())
@@ -104,10 +85,6 @@ namespace LibraryManager.Repositories
             }
         }
 
-        /// <summary>
-        /// Deletes a book from the database by its unique identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier of the book to delete.</param>
         public void Delete(int id)
         {
             using (var conn = GetConnection())
@@ -122,11 +99,63 @@ namespace LibraryManager.Repositories
             }
         }
 
-        /// <summary>
-        /// Maps a database reader row to a Book object.
-        /// </summary>
-        /// <param name="reader">The data reader.</param>
-        /// <returns>A populated <see cref="Book"/> object.</returns>
+        public int? GetAuthorIdForBook(int bookId)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "SELECT AuthorID FROM BookAuthors WHERE BookID = @BookID LIMIT 1";
+                using (var cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@BookID", bookId);
+                    var result = cmd.ExecuteScalar();
+                    if (result == null || result == DBNull.Value)
+                    {
+                        return null;
+                    }
+                    return Convert.ToInt32(result);
+                }
+            }
+        }
+
+        public void SetBookAuthor(int bookId, int? authorId)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string deleteQuery = "DELETE FROM BookAuthors WHERE BookID = @BookID";
+                        using (var deleteCmd = new MySqlCommand(deleteQuery, conn, transaction))
+                        {
+                            deleteCmd.Parameters.AddWithValue("@BookID", bookId);
+                            deleteCmd.ExecuteNonQuery();
+                        }
+
+                        if (authorId.HasValue)
+                        {
+                            string insertQuery = "INSERT INTO BookAuthors (BookID, AuthorID) VALUES (@BookID, @AuthorID)";
+                            using (var insertCmd = new MySqlCommand(insertQuery, conn, transaction))
+                            {
+                                insertCmd.Parameters.AddWithValue("@BookID", bookId);
+                                insertCmd.Parameters.AddWithValue("@AuthorID", authorId.Value);
+                                insertCmd.ExecuteNonQuery();
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
         private Book MapBook(MySqlDataReader reader)
         {
             return new Book
@@ -140,21 +169,11 @@ namespace LibraryManager.Repositories
             };
         }
 
-        /// <summary>
-        /// Maps a Genre enum value to its string representation for the database.
-        /// </summary>
-        /// <param name="genre">The genre enum.</param>
-        /// <returns>The string representation of the genre.</returns>
         private string MapGenreToString(Genre genre)
         {
             return genre == Genre.NonFiction ? "Non-Fiction" : genre.ToString();
         }
 
-        /// <summary>
-        /// Maps a string representation of a genre to its enum value.
-        /// </summary>
-        /// <param name="genreStr">The string representation of the genre.</param>
-        /// <returns>The <see cref="Genre"/> enum value.</returns>
         private Genre MapStringToGenre(string genreStr)
         {
             if (genreStr == "Non-Fiction") return Genre.NonFiction;

@@ -23,6 +23,10 @@ namespace LibraryManager.Forms
             // 
             // dgvLoans
             // 
+            this.dgvLoans.AllowUserToAddRows = false;
+            this.dgvLoans.AllowUserToDeleteRows = false;
+            this.dgvLoans.ReadOnly = true;
+            this.dgvLoans.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvLoans.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvLoans.Location = new System.Drawing.Point(12, 12);
             this.dgvLoans.Name = "dgvLoans";

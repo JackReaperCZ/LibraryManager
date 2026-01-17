@@ -24,6 +24,10 @@ namespace LibraryManager.Forms
             // 
             // dgvAuthors
             // 
+            this.dgvAuthors.AllowUserToAddRows = false;
+            this.dgvAuthors.AllowUserToDeleteRows = false;
+            this.dgvAuthors.ReadOnly = true;
+            this.dgvAuthors.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvAuthors.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvAuthors.Location = new System.Drawing.Point(12, 12);
             this.dgvAuthors.Name = "dgvAuthors";

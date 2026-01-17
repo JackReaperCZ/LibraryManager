@@ -56,6 +56,10 @@ namespace LibraryManager.Forms
             // 
             // dgvReport
             // 
+            this.dgvReport.AllowUserToAddRows = false;
+            this.dgvReport.AllowUserToDeleteRows = false;
+            this.dgvReport.ReadOnly = true;
+            this.dgvReport.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvReport.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvReport.Location = new System.Drawing.Point(12, 50);
             this.dgvReport.Name = "dgvReport";

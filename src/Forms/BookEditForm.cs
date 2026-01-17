@@ -1,13 +1,21 @@
 using LibraryManager.Models;
 using LibraryManager.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace LibraryManager.Forms
 {
     public partial class BookEditForm : Form
     {
+        private class AuthorOption
+        {
+            public int? AuthorID { get; set; }
+            public string Name { get; set; }
+        }
+
         private readonly BookRepository _repository;
+        private readonly AuthorRepository _authorRepository;
         private readonly Book _book;
         private readonly bool _isEdit;
 
@@ -15,21 +23,44 @@ namespace LibraryManager.Forms
         {
             InitializeComponent();
             _repository = new BookRepository();
-            
-            // Populate Genre combo
+            _authorRepository = new AuthorRepository();
+
             cmbGenre.DataSource = Enum.GetValues(typeof(Genre));
+            LoadAuthors();
 
             if (book != null)
             {
                 _book = book;
                 _isEdit = true;
                 PopulateFields();
+                SelectAuthorForBook();
             }
             else
             {
                 _book = new Book();
                 _isEdit = false;
             }
+        }
+
+        private void LoadAuthors()
+        {
+            var options = new List<AuthorOption>
+            {
+                new AuthorOption { AuthorID = null, Name = "Neznámý autor" }
+            };
+
+            foreach (var author in _authorRepository.GetAll())
+            {
+                options.Add(new AuthorOption
+                {
+                    AuthorID = author.AuthorID,
+                    Name = author.FullName
+                });
+            }
+
+            cmbAuthor.DataSource = options;
+            cmbAuthor.DisplayMember = "Name";
+            cmbAuthor.ValueMember = "AuthorID";
         }
 
         private void PopulateFields()
@@ -39,6 +70,28 @@ namespace LibraryManager.Forms
             cmbGenre.SelectedItem = _book.Genre;
             dtpPublished.Value = _book.PublishedDate;
             chkAvailable.Checked = _book.Available;
+        }
+
+        private void SelectAuthorForBook()
+        {
+            var authorId = _repository.GetAuthorIdForBook(_book.BookID);
+            if (authorId.HasValue)
+            {
+                cmbAuthor.SelectedValue = authorId.Value;
+            }
+            else
+            {
+                cmbAuthor.SelectedIndex = 0;
+            }
+        }
+
+        private int? GetSelectedAuthorId()
+        {
+            if (cmbAuthor.SelectedItem is AuthorOption option)
+            {
+                return option.AuthorID;
+            }
+            return null;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -65,6 +118,10 @@ namespace LibraryManager.Forms
                 {
                     _repository.Add(_book);
                 }
+
+                var selectedAuthorId = GetSelectedAuthorId();
+                _repository.SetBookAuthor(_book.BookID, selectedAuthorId);
+
                 DialogResult = DialogResult.OK;
                 Close();
             }
